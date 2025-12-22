@@ -1,3 +1,13 @@
+## [0.0.9]
+### Enhanced
+- Added `fromJson` factories to `TiktokVideo` and `Author` models for better serialization support.
+- Introduced `TikTokException` for cleaner and more specific error handling.
+- Updated minimum Flutter SDK version to `3.3.0`.
+
+### Fixed
+- Fixed typo in `TiktokVideo.copyWith` parameters (`downloadUrl` -> `downloadUrls`).
+- Fixed runtime type errors in `getUserInfo` and `getVideoInfo` by properly casting map data.
+
 ## [0.0.8]
 ### Improved
 - Refactor TikTok video handling to support multiple download URLs and add scraping source options

@@ -1,10 +1,13 @@
 import 'dart:convert';
 
 import 'package:tiktok_scraper/enums.dart';
+import 'package:tiktok_scraper/exceptions.dart';
 import 'package:tiktok_scraper/models/tiktok_video.dart';
 import 'package:dio/dio.dart';
 import 'package:html/parser.dart' as html_parser;
+
 export 'models/tiktok_video.dart';
+export 'exceptions.dart';
 
 /// A class to scrape data from TikTok.
 ///
@@ -35,7 +38,7 @@ class TiktokScraper {
     String? jsonString = element?.text;
 
     if (jsonString == null) {
-      throw Exception('No records found!!');
+      throw TikTokException('No records found!!');
     }
 
     // Parse the JSON data
@@ -47,7 +50,8 @@ class TiktokScraper {
       if (result is Map<String, dynamic> && result.containsKey(key)) {
         result = result[key];
       } else {
-        throw Exception('Invalid nested path or data not found for key: $key');
+        throw TikTokException(
+            'Invalid nested path or data not found for key: $key');
       }
     }
 
@@ -55,7 +59,7 @@ class TiktokScraper {
     if (result is Map<String, dynamic>) {
       return result;
     } else {
-      throw Exception(
+      throw TikTokException(
           'Expected a Map at the final path but found ${result.runtimeType}');
     }
   }
@@ -75,20 +79,17 @@ class TiktokScraper {
     var stats = mainData['stats'];
 
     if (user == null || stats == null) {
-      throw Exception(
+      throw TikTokException(
           "Something went wrong with this user data or username \"$username\" doesn't exist");
     }
 
-    return Author(
-        id: user['id'].toString(),
-        username: username,
-        name: user['nickname'].toString(),
-        avatar: user['avatarLarger'].toString(),
-        followerCount: stats['followerCount'],
-        followingCount: stats['followingCount'],
-        heartCount: stats['heartCount'],
-        videoCount: stats['videoCount'],
-        diggCount: stats['diggCount']);
+    return Author.fromJson({
+      'id': user['id'].toString(),
+      'username': username,
+      'name': user['nickname'].toString(),
+      'avatar': user['avatarLarger'].toString(),
+      ...stats,
+    });
   }
 
   /// Fetch video information by video URL.
@@ -115,28 +116,25 @@ class TiktokScraper {
       downloadUrls = await _tikDownloadData(url);
     }
 
-    return TiktokVideo(
-      id: mainData['id'].toString(),
-      description: mainData['desc'].toString(),
-      createTime: mainData['createTime'].toString(),
-      height: videoData['height'],
-      width: videoData['width'],
-      duration: videoData['duration'],
-      defaultResolution: videoData['ratio'],
-      thumbnail: videoData['cover'].toString(),
-      downloadUrls: downloadUrls,
-      audioUrl: (mainData['music']?['playUrl']).toString(),
-      author: Author(
-          id: authorData['id'].toString(),
-          username: authorData['uniqueId'].toString(),
-          name: authorData['nickname'].toString(),
-          avatar: authorData['avatarLarger'].toString(),
-          followerCount: authorStats['followerCount'],
-          followingCount: authorStats['followingCount'],
-          heartCount: authorStats['heartCount'],
-          videoCount: authorStats['videoCount'],
-          diggCount: authorStats['diggCount']),
-    );
+    return TiktokVideo.fromJson({
+      'id': mainData['id'].toString(),
+      'description': mainData['desc'].toString(),
+      'createTime': mainData['createTime'].toString(),
+      'height': videoData['height'],
+      'width': videoData['width'],
+      'duration': videoData['duration'],
+      'defaultResolution': videoData['ratio'],
+      'thumbnail': videoData['cover'].toString(),
+      'downloadUrls': downloadUrls,
+      'audioUrl': (mainData['music']?['playUrl']).toString(),
+      'author': <String, dynamic>{
+        'id': authorData['id'].toString(),
+        'username': authorData['uniqueId'].toString(),
+        'name': authorData['nickname'].toString(),
+        'avatar': authorData['avatarLarger'].toString(),
+        ...authorStats
+      },
+    });
   }
 
   static Future<List<String>> _tikDownloadData(String url) async {

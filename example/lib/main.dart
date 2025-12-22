@@ -1,17 +1,19 @@
 import 'dart:convert';
-
 import 'package:tiktok_scraper/tiktok_scraper.dart';
-import 'dart:developer';
 
 void main() async {
-  var username = 'mubashardev';
-  Author author = await TiktokScraper.getUserInfo(username);
+  try {
+    var username = 'mubashardev';
+    var author = await TiktokScraper.getUserInfo(username);
 
-  log(jsonEncode(author.toMap()));
+    print(jsonEncode(author.toMap()));
 
-  var videoUrl =
-      'https://www.tiktok.com/@mubashardev/video/7393468652906925317';
-  TiktokVideo video = await TiktokScraper.getVideoInfo(videoUrl);
+    var videoUrl =
+        'https://www.tiktok.com/@mubashardev/video/7393468652906925317';
+    var video = await TiktokScraper.getVideoInfo(videoUrl);
 
-  log(jsonEncode(video.toMap()));
+    print(jsonEncode(video.toMap()));
+  } catch (e) {
+    print(e);
+  }
 }

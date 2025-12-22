@@ -32,12 +32,28 @@ class TiktokVideo {
     required this.author,
   });
 
+  factory TiktokVideo.fromJson(Map<String, dynamic> json) {
+    return TiktokVideo(
+      id: json['id'],
+      description: json['description'],
+      thumbnail: json['thumbnail'],
+      downloadUrls: List<String>.from(json['downloadUrls']),
+      audioUrl: json['audioUrl'],
+      createTime: json['createTime'],
+      duration: json['duration'],
+      height: json['height'],
+      width: json['width'],
+      defaultResolution: json['defaultResolution'],
+      author: Author.fromJson(json['author']),
+    );
+  }
+
   TiktokVideo copyWith({
     String? id,
     String? title,
     String? description,
     String? thumbnail,
-    List<String>? downloadUrl,
+    List<String>? downloadUrls,
     String? audioUrl,
     String? createTime,
     int? duration,
@@ -50,7 +66,7 @@ class TiktokVideo {
       id: id ?? this.id,
       description: description ?? this.description,
       thumbnail: thumbnail ?? this.thumbnail,
-      downloadUrls: downloadUrl ?? this.downloadUrls,
+      downloadUrls: downloadUrls ?? this.downloadUrls,
       audioUrl: audioUrl ?? this.audioUrl,
       createTime: createTime ?? this.createTime,
       duration: duration ?? this.duration,
@@ -156,6 +172,20 @@ class Author {
     this.heartCount,
     this.diggCount,
   });
+
+  factory Author.fromJson(Map<String, dynamic> json) {
+    return Author(
+      id: json['id'],
+      username: json['username'],
+      name: json['name'],
+      avatar: json['avatar'],
+      followerCount: json['followerCount'],
+      followingCount: json['followingCount'],
+      videoCount: json['videoCount'],
+      heartCount: json['heartCount'],
+      diggCount: json['diggCount'],
+    );
+  }
 
   Author copyWith({
     String? id,
