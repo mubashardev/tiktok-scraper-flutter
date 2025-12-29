@@ -1,3 +1,11 @@
+## [0.1.0]
+### Fixed
+- Fixed "No records found" error by adding a default Desktop `User-Agent` to all requests.
+- Added `TiktokScraper.userAgent` to allow configuring the User-Agent if needed.
+
+### Note
+- **Important:** It is highly recommended to use the default Desktop User-Agent. Using a mobile User-Agent may trigger TikTok's mobile site, which is not supported by this scraper.
+
 ## [0.0.9]
 ### Enhanced
 - Added `fromJson` factories to `TiktokVideo` and `Author` models for better serialization support.

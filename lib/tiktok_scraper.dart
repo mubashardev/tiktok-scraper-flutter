@@ -14,6 +14,19 @@ export 'exceptions.dart';
 /// This class provides methods to fetch and parse user and video information
 /// from TikTok using specified URLs and paths.
 class TiktokScraper {
+  /// User-Agent to be used for requests.
+  ///
+  /// If null, a default Desktop User-Agent is used.
+  /// You can set this to your device's User-Agent or any custom string.
+  ///
+  /// **Note:** It is highly recommended to use a Desktop User-Agent (like the default one).
+  /// Using a mobile User-Agent (e.g., from iOS/Android devices) may trigger TikTok's mobile
+  /// website, which has a different structure and may break the scraper.
+  static String? userAgent;
+
+  static const String _defaultUserAgent =
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
+
   /// Fetches and parses the JSON data from the provided URL at the specified
   /// nested path.
   ///
@@ -30,7 +43,14 @@ class TiktokScraper {
   static Future<Map<String, dynamic>> _data(
       String url, List<String> nestedPath) async {
     // Fetch the response from the provided URL
-    var response = await Dio().get(url);
+    var response = await Dio().get(
+      url,
+      options: Options(
+        headers: {
+          "User-Agent": userAgent ?? _defaultUserAgent,
+        },
+      ),
+    );
 
     // Parse the HTML document
     var document = html_parser.parse(response.data);
@@ -38,7 +58,8 @@ class TiktokScraper {
     String? jsonString = element?.text;
 
     if (jsonString == null) {
-      throw TikTokException('No records found!!');
+      throw TikTokException(
+          'No records found! This might be due to a rate limit or a change in TikTok\'s website structure. Please try again later.');
     }
 
     // Parse the JSON data
@@ -142,6 +163,9 @@ class TiktokScraper {
       BaseOptions(
         queryParameters: {
           "q": url,
+        },
+        headers: {
+          "User-Agent": userAgent ?? _defaultUserAgent,
         },
       ),
     ).post(ScrapeVideoSource.TikDownloader.url))
